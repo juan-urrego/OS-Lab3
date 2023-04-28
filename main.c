@@ -2,17 +2,16 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include "./tools/matrix.c"
-#include "./tools/execution_time.c"
 #include "./tools/parametros.c"
-#include "./operations/matrix_scalar.c"
-#include "./operations/normalize_formula1.c"
-#include "./operations/normalize_formula2.c"
 #include "./tools/file.c"
-#include "./operations/matrices_sum.c"
-#include "./operations/matrices_dot.c"
 #include "./tools/validations.c"
-#include "./operations/column_mean.c"
-#include "./operations/column_variance.c"
+#include "./operations/1_mean_column.c"
+#include "./operations/2_variance_column.c"
+#include "./operations/5_sum_matrix.c"
+#include "./operations/6_dot_matrix.c"
+#include "./operations/7_scalar_matrix.c"
+#include "./operations/8_normalize_formula1.c"
+#include "./operations/9_normalize_formula2.c"
 #include "./tools/minorValue.c"
 
 int main(int argc, char *argv[]) {
@@ -37,33 +36,33 @@ int select_operation(int o, int f, int c, int r, int s, double e, int n, int fil
     switch (o)
     {
     case 1:
-        matrix_columns_mean(f, c, n, file);
+        calculate_column_matrix_mean(f, c, n, file);
         return 0;
     case 2:
-        matrix_columns_variance(f, c, n, file);
+        calculate_column_matrix_variance(f, c, n, file);
         return 0;
     case 3:
-        Matrix *M = create_matrix_from_file("op1.txt", f, c);
-        Vector *V = matrix_col_std(M);
-        print_matrix(M);
-        print_vector(V);
+        // Matrix *M = create_matrix_from_file("op1.txt", f, c);
+        // Vector *V = matrix_col_std(M);
+        // print_matrix(M);
+        // print_vector(V);
         return 0;
     case 4:
         return 0;
     case 5:
-        add_two_matrices(f, c, r, s, n, file);
+        calculate_sum_two_matrix(f, c, r, s, n, file);
         return 0;
     case 6:
-        dot_two_matrices(f, c, r, s, n, file);
+        calculate_dot_two_matrix(f, c, r, s, n, file);
         return 0;
     case 7:
-        multiply_matrix_by_scalar(f, c, e, n, file);
+        calculate_matrix_by_scalar(f, c, e, n, file);
         return 0;
     case 8:
-        main_normalize_formula_1(f, c, n, file);
+        calculate_normalize_formula1(f, c, n, file);
         return 0;
     case 9:
-        main_normalize_formula_2(f, c, n, file);
+        calculate_normalize_formula2(f, c, n, file);
         return 0;
     default:
         printf("Operacion no valida %d ", o);

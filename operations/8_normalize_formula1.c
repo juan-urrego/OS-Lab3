@@ -3,7 +3,6 @@
 #include <unistd.h>
 #include <sys/time.h>
 #include <pthread.h>
-#include "../tools/execution_time.c" 
 #include "../tools/validations.c"
 #include "../tools/minorValue.c"
 //Estructura para pasar los argumentos a la función que normaliza la matriz
@@ -16,35 +15,15 @@ typedef struct {
     pthread_mutex_t* lock;
 } Args_normalize_form1_m_t;
 
-//Función principal que normaliza la matriz
-void* normalize_formula_1(void* args_ptr) {
-    Args_normalize_form1_m_t* args = (Args_normalize_form1_m_t*) args_ptr;
-    for (int i = args->start_row; i < args->end_row; ++i) {
-        for (int j = 0; j < args->M->cols; ++j) {
-            pthread_mutex_lock(args->lock);
-            args->M->elements[i][j] = (args->M->elements[i][j] - args->menores->elements[j]) / (args->mayores->elements[j] - args->menores->elements[j]);
-            pthread_mutex_unlock(args->lock);
-        }
-    }
+void calculate_normalize_formula1(int rows, int cols, int n, int file);
+void calculate_formula1_without_parallel(Matrix* M, Vector* larger_numbers, Vector* minors_numbers);
+void calculate_formula1_with_parallel(Matrix* M, Vector* mayores, Vector* menores, int n);
+void* parallel_formula1_method(void* args_ptr);
 
-    return NULL;
-}
 
-//Función principal que recibe los datos de entrada y llama a las funciones que realizan la normalización
-void main_normalize_formula_1(int rows, int cols, int n, int file){
+
+void calculate_normalize_formula1(int rows, int cols, int n, int file){
     validate_data_operation_with_one_matrix(rows, cols, n);
-    if(rows==1) {
-       printf("It's impossible to normalize a matrix with only one row\n");
-        exit(EXIT_FAILURE);
-    }
-    else {
-        main_normalize_matrix_formula1(rows, cols, n, file);
-    }
-    
-}
-
-//Función que llama las funciones que realizan la normalización de la matriz
-void main_normalize_matrix_formula1(int rows, int cols, int n, int file){
 
     struct Matrix* M=NULL;
     if( file==1) {
@@ -63,29 +42,37 @@ void main_normalize_matrix_formula1(int rows, int cols, int n, int file){
     print_matrix(M);   
     Matrix* M1 = create_matrix(rows, cols);
     copy_matrix(M1,M);
-    normalize_matrix_formula1_without_parallel_programming(M1, larger_numbers, minors_numbers);
+    calculate_formula1_without_parallel(M1, larger_numbers, minors_numbers);
     Matrix* M2 = create_matrix(rows, cols);
     copy_matrix(M2,M);
-    normalize_matrix_formula1_with_parallel_programming(M2,larger_numbers, minors_numbers, n);
+    calculate_formula1_with_parallel(M2,larger_numbers, minors_numbers, n);
     free_matrix(M);
 }
 
 //Función que realiza la normalización de la matriz por un escalar sin usar paralelismo
-void normalize_matrix_formula1_without_parallel_programming(Matrix* M, Vector* larger_numbers, Vector* minors_numbers){
-    printf("\nNormalize matrix  formula 1 without Parallel programming\n");
+void calculate_formula1_without_parallel(Matrix* M, Vector* larger_numbers, Vector* minors_numbers){
+    printf("\nCalculo de normalizacion con formula 1 SIN paralelismo\n");
+
     struct timeval start, end;
     gettimeofday(&start, 0);
+
     normalize_matrix_column_formula_1(M, larger_numbers, minors_numbers);
+
     gettimeofday(&end, 0);
-    get_execution_time(start, end);
+    double elapsed_time = ((double)(end.tv_usec - start.tv_usec) /1000000 + (double)(end.tv_sec - start.tv_sec));
+    printf("Tiempo de ejecución: %fms\n", elapsed_time);
+
     print_matrix(M);
     free_matrix(M);
 }
 
 //Función que realiza la normalización de una matriz usando paralelismo
-void normalize_matrix_formula1_with_parallel_programming(Matrix* M, Vector* mayores, Vector* menores, int n) {
-    printf("\nNormalize matrix formula 1 with Parallel programming\n");    
+void calculate_formula1_with_parallel(Matrix* M, Vector* mayores, Vector* menores, int n) {
+    printf("\nCalculo de normalizacion con formula 1 CON paralelismo\n");    
+
     struct timeval start, end;
+    gettimeofday(&start, 0);
+
     const int num_threads =minor_value(n,M->rows);
     pthread_mutex_t lock;
     pthread_mutex_init(&lock, NULL);
@@ -93,7 +80,6 @@ void normalize_matrix_formula1_with_parallel_programming(Matrix* M, Vector* mayo
     Args_normalize_form1_m_t args[num_threads];
     int chunk_size = M->rows / num_threads;
     int extra_rows = M->rows % num_threads;
-    gettimeofday(&start, 0);
     for (int i = 0; i < num_threads; ++i) {
         args[i].M = M;
         args[i].mayores = mayores;
@@ -106,16 +92,31 @@ void normalize_matrix_formula1_with_parallel_programming(Matrix* M, Vector* mayo
         }
         args[i].start_row = start_row;
         args[i].end_row = end_row;
-        pthread_create(&threads[i], NULL, normalize_formula_1, &args[i]);
+        pthread_create(&threads[i], NULL, parallel_formula1_method, &args[i]);
     }
     for (int i = 0; i < num_threads; ++i) {
         pthread_join(threads[i], NULL);
     }
     pthread_mutex_destroy(&lock);
-    gettimeofday(&end, 0);
 
-    get_execution_time(start, end);
+    gettimeofday(&end, 0);
+    double elapsed_time = ((double)(end.tv_usec - start.tv_usec) /1000000 + (double)(end.tv_sec - start.tv_sec));
+    printf("Tiempo de ejecución: %fms\n", elapsed_time);
+
     print_matrix(M);
     free_matrix(M);
 }
 
+
+//Función principal que normaliza la matriz
+void* parallel_formula1_method(void* args_ptr) {
+    Args_normalize_form1_m_t* args = (Args_normalize_form1_m_t*) args_ptr;
+    for (int i = args->start_row; i < args->end_row; ++i) {
+        for (int j = 0; j < args->M->cols; ++j) {
+            pthread_mutex_lock(args->lock);
+            args->M->elements[i][j] = (args->M->elements[i][j] - args->menores->elements[j]) / (args->mayores->elements[j] - args->menores->elements[j]);
+            pthread_mutex_unlock(args->lock);
+        }
+    }
+    return NULL;
+}
