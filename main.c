@@ -15,10 +15,7 @@
 #include "./operations/column_variance.c"
 #include "./tools/minorValue.c"
 
-int select_operation(int o, int f, int c, int r, int s, double e, int n, int file);
-
-int main(int argc, char *argv[])
-{
+int main(int argc, char *argv[]) {
     int o = 0, f = 0, c = 0, r = 0, s = 0, n = 0, file = 0;
     char p[200] = "";
     double e = 0;
@@ -35,8 +32,8 @@ int main(int argc, char *argv[])
     }
     return 0;
 }
-int select_operation(int o, int f, int c, int r, int s, double e, int n, int file)
-{
+
+int select_operation(int o, int f, int c, int r, int s, double e, int n, int file) {
     switch (o)
     {
     case 1:
