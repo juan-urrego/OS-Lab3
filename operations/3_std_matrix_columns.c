@@ -21,7 +21,7 @@ void findStd(Matrix* M);
 
 
 void calculate_matrix_columns_standard_deviation(int m_rows, int m_cols, int n, int file) {
-    validate_data_operation_with_one_matrix(m_rows, m_cols, n);
+    validate_one_matrix_operation(m_rows, m_cols, n);
     Matrix *M = NULL;
     if (file == 1) {
         M = create_matrix_from_file("op1.txt", m_rows, m_cols);

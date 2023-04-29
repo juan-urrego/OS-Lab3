@@ -7,6 +7,8 @@
 #include "./tools/validations.c"
 #include "./operations/1_mean_column.c"
 #include "./operations/2_variance_column.c"
+#include "./operations/3_std_matrix_columns.c"
+#include "./operations/4_minmax_matrix_columns.c"
 #include "./operations/5_sum_matrix.c"
 #include "./operations/6_dot_matrix.c"
 #include "./operations/7_scalar_matrix.c"

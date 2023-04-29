@@ -29,7 +29,7 @@ void read_file(int *c, double *e, int *f, int *n, int *o, char *p, int *r, int *
     //Se abre el archivo de entrada
     FILE *data=fopen(p,"r");
     if (data == NULL) {
-        printf("Error abriendo el archico de entrada %s\n", p);
+        printf("Error abriendo el archivo de entrada %s\n", p);
         exit(1);
     }
     //Se lee el archivo linea por linea
