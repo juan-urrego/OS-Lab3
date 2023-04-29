@@ -24,7 +24,7 @@ void* parallel_scalar_method(void* arg);
 
 
 void calculate_matrix_by_scalar(int rows, int cols, double scalar, int n,int file){
-    validate_data_operation_with_one_matrix(rows, cols, n);
+    validate_one_matrix_operation(rows, cols, n);
     Matrix* M=NULL;
     if(file==1) {
         M=create_matrix_from_file("op1.txt",rows,cols);

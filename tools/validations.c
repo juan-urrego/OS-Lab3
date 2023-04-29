@@ -3,38 +3,39 @@
 #include <unistd.h>
 #ifndef VALIDATIONS_H
 #define VALIDATIONS_H
-//función que valida que los datos de entrada sean correctos
-void validate_data_operation_with_one_matrix(int rows, int columns, int n){
-    //validar que las filas y columnas sean mayores a 0
-    if(rows <= 0 || columns <= 0){
-        printf("The number of rows and columns must be greater than 0\n");
-        exit(EXIT_FAILURE);
-    }
-    //validar que el número de hilos sea mayor a 0
-    if(n <= 0){
-        printf("Number of threads must be greater than 0\n");
-        exit(EXIT_FAILURE);
-    }
+
+void error_message(char *message){
+    printf("%s\n", message);
+    exit(EXIT_FAILURE);
 }
-//Función que valida que haya más de una fila en la matriz
-void validate_data_operation_with_one_matrix_rows(int rows){
-    if(rows <= 1){
-        printf("The number of rows must be greater than 1\n");
-        exit(EXIT_FAILURE);
+
+//Se validan los datos de entrada para la operación de suma
+void validate_one_matrix_operation(int rows_quantity, int columns_quantity, int threads_quantity){
+    //Se validan que las filas y columnas sean mayores a 0
+    if(rows_quantity <= 0 || columns_quantity <= 0){
+        error_message("The quantity of both rows and columns must exceed 0.");
+    }
+    // Se validan que el número de hilos sea mayor a 0
+    if(threads_quantity <= 0){
+        error_message("The amount of threads should be higher than zero.");
     }
 }
 
+// Se validan los datos de entrada para la operación de suma
+void validate_matrix_operation_by_rows(int rows_quantity){
+    if(rows_quantity <= 1){
+        error_message("The rows quantity must be greater than 1.");
+    }
+}
 
-void validate_data_operation_with_two_matrices(int m1_rows, int m1_cols, int m2_rows, int m2_cols, int n){
+void validate_two_matrices_operation(int matrix1_rows, int matrix1_cols, int matrix2_rows, int m2_cols, int threads_quantity){
     //validar que las filas y columnas sean mayores a 0
-    if(m1_rows <= 0 || m1_cols <= 0 || m2_rows <= 0 || m2_cols <= 0){
-        printf("The number of rows and columns must be greater than 0\n");
-        exit(EXIT_FAILURE);
+    if(matrix1_rows <= 0 || matrix1_cols <= 0 || matrix2_rows <= 0 || m2_cols <= 0){
+        error_message("The quantity of both rows and columns must exceed 0.");
     }
     //validar que el número de hilos sea mayor a 0
-    if(n <= 0){
-        printf("Number of threads must be greater than 0\n");
-        exit(EXIT_FAILURE);
+    if(threads_quantity <= 0){
+        error_message("The amount of threads should be higher than zero.");
     }
 }
 

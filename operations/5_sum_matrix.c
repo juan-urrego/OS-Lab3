@@ -23,26 +23,26 @@ void calculate_sum_with_parallel(Matrix *M, Matrix *N, int n);
 void *parallel_sum_method(void *arg);
 
 
-void calculate_sum_two_matrix(int m1_rows, int m1_cols, int m2_rows, int m2_cols, int n, int file) {
-    validate_data_operation_with_two_matrices(m1_rows, m1_cols, m2_rows, m2_cols, n);
-    Matrix *M = NULL, *N = NULL;
+void calculate_sum_two_matrix(int m1_rows, int m1_cols, int m2_rows, int m2_cols, int threads, int file) {
+    validate_two_matrices_operation(m1_rows, m1_cols, m2_rows, m2_cols, threads);
+    Matrix *matrix_pointer_1 = NULL, *matrix_pointer_2 = NULL;
     if (file == 1) {
-        M = create_matrix_from_file("op1.txt", m1_rows, m1_cols);
-        N = create_matrix_from_file("op2.txt", m2_rows, m2_cols);
+        matrix_pointer_1 = create_matrix_from_file("op1.txt", m1_rows, m1_cols);
+        matrix_pointer_2 = create_matrix_from_file("op2.txt", m2_rows, m2_cols);
     }
     else {
-        M = create_matrix(m1_rows, m1_cols);
-        init_matrix_rand(M);
-        N = create_matrix(m2_rows, m2_cols);
-        init_matrix_rand(N);
+        matrix_pointer_1 = create_matrix(m1_rows, m1_cols);
+        init_matrix_rand(matrix_pointer_1);
+        matrix_pointer_2 = create_matrix(m2_rows, m2_cols);
+        init_matrix_rand(matrix_pointer_2);
     }
 
-    print_matrix(M);
-    print_matrix(N);
-    calculate_sum_without_parallel(M, N);
-    calculate_sum_with_parallel(M, N, n);
-    free_matrix(M);
-    free_matrix(N);
+    print_matrix(matrix_pointer_1);
+    print_matrix(matrix_pointer_2);
+    calculate_sum_without_parallel(matrix_pointer_1, matrix_pointer_2);
+    calculate_sum_with_parallel(matrix_pointer_1, matrix_pointer_2, threads);
+    free_matrix(matrix_pointer_1);
+    free_matrix(matrix_pointer_2);
 }
 
 void calculate_sum_without_parallel(Matrix *M, Matrix *N) {

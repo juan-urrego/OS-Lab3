@@ -26,7 +26,7 @@ void *parallel_dot_method(void *arg);
 
 
 void calculate_dot_two_matrix(int m1_rows, int m1_cols, int m2_rows, int m2_cols, int n, int file) {
-    validate_data_operation_with_two_matrices(m1_rows, m1_cols, m2_rows, m2_cols, n);
+    validate_two_matrices_operation(m1_rows, m1_cols, m2_rows, m2_cols, n);
     Matrix *M = NULL, *N = NULL;
     if (file == 1) {
         M = create_matrix_from_file("op1.txt", m1_rows, m1_cols);

@@ -22,21 +22,21 @@ void *parallel_mean_method(void *arg);
 
 
 
-void calculate_column_matrix_mean(int m_rows, int m_cols, int n, int file) {
-    validate_data_operation_with_one_matrix(m_rows, m_cols, n);
-    validate_data_operation_with_one_matrix_rows(m_rows);
-    Matrix *M = NULL;
+void calculate_column_matrix_mean(int matrix_rows, int matrix_cols, int threads, int file) {
+    validate_one_matrix_operation(matrix_rows, matrix_cols, threads);
+    validate_matrix_operation_by_rows(matrix_rows);
+    Matrix *matrix_pointer = NULL;
     if (file == 1) {
-        M = create_matrix_from_file("op1.txt", m_rows, m_cols);
+        matrix_pointer = create_matrix_from_file("op1.txt", matrix_rows, matrix_cols);
     }
     else {
-        M = create_matrix(m_rows, m_cols);
-        init_matrix_rand(M);
+        matrix_pointer = create_matrix(matrix_rows, matrix_cols);
+        init_matrix_rand(matrix_pointer);
     }
-    print_matrix(M);
-    calculate_mean_without_parallel(M);
-    calculate_mean_with_parallel(M, n);
-    free_matrix(M);
+    print_matrix(matrix_pointer);
+    calculate_mean_without_parallel(matrix_pointer);
+    calculate_mean_with_parallel(matrix_pointer, threads);
+    free_matrix(matrix_pointer);
 };
 
 void calculate_mean_without_parallel(Matrix *M) {
