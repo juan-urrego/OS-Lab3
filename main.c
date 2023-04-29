@@ -42,12 +42,10 @@ int select_operation(int o, int f, int c, int r, int s, double e, int n, int fil
         calculate_column_matrix_variance(f, c, n, file);
         return 0;
     case 3:
-        // Matrix *M = create_matrix_from_file("op1.txt", f, c);
-        // Vector *V = matrix_col_std(M);
-        // print_matrix(M);
-        // print_vector(V);
+        calculate_matrix_columns_standard_deviation(f, c, n, file);
         return 0;
     case 4:
+        calculate_matrix_columns_min_max(f, c, n, file);
         return 0;
     case 5:
         calculate_sum_two_matrix(f, c, r, s, n, file);
