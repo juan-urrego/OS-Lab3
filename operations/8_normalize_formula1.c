@@ -23,30 +23,30 @@ void* parallel_formula1_method(void* args_ptr);
 
 
 void calculate_normalize_formula1(int rows, int cols, int n, int file){
-    validate_data_operation_with_one_matrix(rows, cols, n);
+    validate_one_matrix_operation(rows, cols, n);
 
-    struct Matrix* M=NULL;
+    struct Matrix* matrix_pointer=NULL;
     if( file==1) {
-        M =create_matrix_from_file("op1.txt",rows,cols);
+        matrix_pointer =create_matrix_from_file("op1.txt",rows,cols);
     }
     else {
-        M = create_matrix(rows, cols);
-        init_matrix_rand(M);
+        matrix_pointer = create_matrix(rows, cols);
+        init_matrix_rand(matrix_pointer);
     }
-    Vector* larger_numbers = matrix_col_max(M);
+    Vector* larger_numbers = matrix_col_max(matrix_pointer);
     printf("Vector de numeros mayores: \n");
     print_vector(larger_numbers);
-    Vector* minors_numbers = matrix_col_min(M);
+    Vector* minors_numbers = matrix_col_min(matrix_pointer);
     printf("Vector de numeros menores: \n");
     print_vector(minors_numbers);
-    print_matrix(M);   
+    print_matrix(matrix_pointer);   
     Matrix* M1 = create_matrix(rows, cols);
-    copy_matrix(M1,M);
+    copy_matrix(M1,matrix_pointer);
     calculate_formula1_without_parallel(M1, larger_numbers, minors_numbers);
     Matrix* M2 = create_matrix(rows, cols);
-    copy_matrix(M2,M);
+    copy_matrix(M2,matrix_pointer);
     calculate_formula1_with_parallel(M2,larger_numbers, minors_numbers, n);
-    free_matrix(M);
+    free_matrix(matrix_pointer);
 }
 
 //Función que realiza la normalización de la matriz por un escalar sin usar paralelismo

@@ -9,17 +9,18 @@
 
 typedef struct Vector Vector;
 struct Vector {
-    int size;
     double* elements;
+    int size;
 };
 
 typedef struct Matrix Matrix;
 struct Matrix {
-    int rows;
-    int cols;
     double** elements;
+    int cols;
+    int rows;
 };
 
+/*Metodos de vectores*/
 
 Vector* create_vector(int size) {
     Vector* v = calloc(1, sizeof(Vector));
@@ -32,7 +33,7 @@ Vector* create_vector_from_file(const char* file_path, int size) {
     Vector* v = create_vector(size);
     FILE* fp = fopen(file_path, "r");
     if (fp == NULL) {
-        fprintf(stderr, "Failed to open \"%s\". Not possible to create vector from file.\n", file_path);
+        fprintf(stderr, "Fallo al abrir \"%s\". No es posible crear un vector del archivo.\n", file_path);
         return NULL;
     }
 
@@ -40,7 +41,7 @@ Vector* create_vector_from_file(const char* file_path, int size) {
     for (int i = 0; i < v->size; ++i) {
         const int r = fscanf(fp, "%lf", &d);
         if (r != 1) {
-            fprintf(stderr, "fscanf failed.\n");
+            fprintf(stderr, "fscanf falló.\n");
             fclose(fp);
             return NULL;
         }
@@ -50,6 +51,71 @@ Vector* create_vector_from_file(const char* file_path, int size) {
     fclose(fp);
     return v;
 }
+
+void init_vector_rand(Vector* V){
+    for(int i = 0; i < V->size; ++i){
+	V->elements[i] = (double)rand() / (double)RAND_MAX;
+    }
+}
+
+void init_matrix_rand(Matrix* M) {
+    for (int i = 0; i < M->rows; ++i) {
+        for (int j = 0; j < M->cols; ++j) {
+            M->elements[i][j] = (double)rand() / (double)RAND_MAX;
+        }
+    }
+}
+
+void copy_vector(Vector* dst, const Vector* src) {
+    for (int i = 0; i < src->size; ++i) {
+        dst->elements[i] = src->elements[i];
+    }
+}
+
+void free_vector(Vector* v) {
+    free(v->elements);
+    free(v);
+}
+
+Vector* add_vector(const Vector* a, const Vector* b) {
+    if (a->size != b->size) {
+        fprintf(stderr, "Tamaño invalido. %d y %d\n", a->size, b->size);
+        return NULL;
+    }
+
+    Vector* r = create_vector(a->size);
+    for (int i = 0; i < r->size; ++i) {
+        r->elements[i] = a->elements[i] + b->elements[i];
+    }
+
+    return r;
+}
+
+Vector* dot_vector_matrix(const Vector* v, const Matrix* M) {
+    if (v->size != M->rows) {
+        fprintf(stderr, "Tamaño invalido. %d y (%d, %d)\n", v->size, M->rows, M->cols);
+        return NULL;
+    }
+
+    Vector* r = create_vector(M->cols);
+    for (int i = 0; i < r->size; ++i) {
+        double d = 0.0;
+        for (int j = 0; j < M->rows; ++j) {
+            d += (v->elements[j] * M->elements[j][i]);
+        }
+        r->elements[i] = d;
+    }
+
+    return r;
+}
+
+void normalize_vector_formula_2(Vector* v, float vrz, float std){
+    for (int i = 0; i < v->size; ++i) {
+        v->elements[i] = (v->elements[i] - vrz) / std;
+    }
+}
+
+/*Metodos de Matrices*/
 
 Matrix* create_matrix(int rows, int cols) {
     Matrix* M = malloc(sizeof(Matrix));
@@ -67,7 +133,7 @@ Matrix* create_matrix_from_file(const char* file_path, int rows, int cols) {
     Matrix* M = create_matrix(rows, cols);
     FILE* fp = fopen(file_path, "r");
     if (fp == NULL) {
-        fprintf(stderr, "Failed to open \"%s\". Not possible to create matrix from file.\n", file_path);
+        fprintf(stderr, "Fallo al abrir el archivo \"%s\". No es posible crear la matriz del archivo.\n", file_path);
         return NULL;
     }
 
@@ -76,7 +142,7 @@ Matrix* create_matrix_from_file(const char* file_path, int rows, int cols) {
         for (int j = 0; j < M->cols; ++j) {
             const int r = fscanf(fp, "%lf", &d);
             if (r != 1) {
-                fprintf(stderr, "fscanf failed.\n");
+                fprintf(stderr, "fscanf fallo.\n");
                 fclose(fp);
                 return NULL;
             }
@@ -88,19 +154,69 @@ Matrix* create_matrix_from_file(const char* file_path, int rows, int cols) {
     return M;
 }
 
-void init_matrix_rand(Matrix* M) {
+void scalar_matrix(Matrix* M, double k) {
     for (int i = 0; i < M->rows; ++i) {
-        for (int j = 0; j < M->cols; ++j) {
-            M->elements[i][j] = (double)rand() / (double)RAND_MAX;
-        }
+       for (int j = 0; j < M->cols; ++j) {
+            M->elements[i][j] *= k;
+       }
     }
 }
 
-void init_vector_rand(Vector* V){
-    for(int i = 0; i < V->size; ++i){
-	V->elements[i] = (double)rand() / (double)RAND_MAX;
+void scalar_vector(Vector* V, double k) {
+    for (int i = 0; i < V->size; ++i) {
+        V->elements[i] *= k;
     }
 }
+
+void print_vector(const Vector* v) {
+    printf("Tamaño=%d, [", v->size);
+    for (int i = 0; i < v->size; ++i) {
+        printf("%lf ", v->elements[i]);
+    }
+    printf("]\n");
+}
+
+void normalize_vector_formula_1(Vector* v, float max, float min){
+    for (int i = 0; i < v->size; ++i) {
+        v->elements[i] = (v->elements[i] - min) / (max - min);
+    }
+}
+
+float max_vector(const Vector* v){
+    float max = v->elements[0];
+    for (int i = 0; i < v->size; ++i) {
+        if (max < v->elements[i]) {
+            max = v->elements[i];
+        }
+    }
+    return max;
+}
+float min_vector(const Vector* v){
+    float min = v->elements[0];
+    for (int i = 0; i < v->size; ++i) {
+        if (min > v->elements[i]) {
+            min = v->elements[i];
+        }
+    }
+    return min;
+}
+float vrz_vector(const Vector* v){
+    float sum = 0.0;
+    for (int i = 0; i < v->size; ++i) {
+        sum += v->elements[i];
+    }
+    return sum / v->size;
+}
+float std_vector(const Vector* v){
+    float sum = 0.0;
+    float vrz = vrz_vector(v);
+    for (int i = 0; i < v->size; ++i) {
+        sum += pow(v->elements[i] - vrz, 2);
+    }
+    return sqrt(sum / v->size);
+}
+
+
 
 void copy_matrix(Matrix* dst, const Matrix* src) {
     for (int i = 0; i < src->rows; ++i) {
@@ -110,16 +226,7 @@ void copy_matrix(Matrix* dst, const Matrix* src) {
     }
 }
 
-void copy_vector(Vector* dst, const Vector* src) {
-    for (int i = 0; i < src->size; ++i) {
-        dst->elements[i] = src->elements[i];
-    }
-}
 
-void free_vector(Vector* v) {
-    free(v->elements);
-    free(v);
-}
 
 void free_matrix(Matrix* M) {
     for (int i = 0; i < M->rows; ++i) {
@@ -129,41 +236,11 @@ void free_matrix(Matrix* M) {
     free(M);
 }
 
-Vector* add_vector(const Vector* a, const Vector* b) {
-    if (a->size != b->size) {
-        fprintf(stderr, "Invalid size. %d and %d\n", a->size, b->size);
-        return NULL;
-    }
 
-    Vector* r = create_vector(a->size);
-    for (int i = 0; i < r->size; ++i) {
-        r->elements[i] = a->elements[i] + b->elements[i];
-    }
-
-    return r;
-}
-
-Vector* dot_vector_matrix(const Vector* v, const Matrix* M) {
-    if (v->size != M->rows) {
-        fprintf(stderr, "Invalid size. %d and (%d, %d)\n", v->size, M->rows, M->cols);
-        return NULL;
-    }
-
-    Vector* r = create_vector(M->cols);
-    for (int i = 0; i < r->size; ++i) {
-        double d = 0.0;
-        for (int j = 0; j < M->rows; ++j) {
-            d += (v->elements[j] * M->elements[j][i]);
-        }
-        r->elements[i] = d;
-    }
-
-    return r;
-}
 
 Matrix* add_matrix(const Matrix* M, const Matrix* N) {
     if (M->rows != N->rows || M->cols != N->cols) {
-        fprintf(stderr, "Invalid size. (%d, %d) and (%d, %d)\n", M->rows, M->cols, N->rows, N->cols);
+        fprintf(stderr, "Tamaño invalido. (%d, %d) y (%d, %d)\n", M->rows, M->cols, N->rows, N->cols);
         return NULL;
     }
 
@@ -179,7 +256,7 @@ Matrix* add_matrix(const Matrix* M, const Matrix* N) {
 
 Matrix* dot_matrix(const Matrix* M, const Matrix* N) {
     if (M->cols != N->rows) {
-        fprintf(stderr, "Invalid size. (%d, %d) and (%d, %d)\n", M->rows, M->cols, N->rows, N->cols);
+        fprintf(stderr, "Tamaño invalido. (%d, %d) y (%d, %d)\n", M->rows, M->cols, N->rows, N->cols);
         return NULL;
     }
 
@@ -225,30 +302,10 @@ Vector* matrix_col_sum(const Matrix* M) {
     return v;
 }
 
-void scalar_matrix(Matrix* M, double k) {
-    for (int i = 0; i < M->rows; ++i) {
-       for (int j = 0; j < M->cols; ++j) {
-            M->elements[i][j] *= k;
-       }
-    }
-}
 
-void scalar_vector(Vector* V, double k) {
-    for (int i = 0; i < V->size; ++i) {
-        V->elements[i] *= k;
-    }
-}
-
-void print_vector(const Vector* v) {
-    printf("size=%d, [", v->size);
-    for (int i = 0; i < v->size; ++i) {
-        printf("%lf ", v->elements[i]);
-    }
-    printf("]\n");
-}
 
 void print_matrix(const Matrix* M) {
-    printf("rows=%d,cols=%d,\n[\n", M->rows, M->cols);
+    printf("Filas=%d,Columnas=%d,\n[\n", M->rows, M->cols);
     for (int i = 0; i < M->rows; ++i) {
         printf("[");
         for (int j = 0; j < M->cols; ++j) {
@@ -329,50 +386,7 @@ void normalize_matrix_column_formula_2(Matrix* M, Vector* vrz, Vector* std){
     }
 }
 
-void normalize_vector_formula_1(Vector* v, float max, float min){
-    for (int i = 0; i < v->size; ++i) {
-        v->elements[i] = (v->elements[i] - min) / (max - min);
-    }
-}
 
-float max_vector(const Vector* v){
-    float max = v->elements[0];
-    for (int i = 0; i < v->size; ++i) {
-        if (max < v->elements[i]) {
-            max = v->elements[i];
-        }
-    }
-    return max;
-}
-float min_vector(const Vector* v){
-    float min = v->elements[0];
-    for (int i = 0; i < v->size; ++i) {
-        if (min > v->elements[i]) {
-            min = v->elements[i];
-        }
-    }
-    return min;
-}
-float vrz_vector(const Vector* v){
-    float sum = 0.0;
-    for (int i = 0; i < v->size; ++i) {
-        sum += v->elements[i];
-    }
-    return sum / v->size;
-}
-float std_vector(const Vector* v){
-    float sum = 0.0;
-    float vrz = vrz_vector(v);
-    for (int i = 0; i < v->size; ++i) {
-        sum += pow(v->elements[i] - vrz, 2);
-    }
-    return sqrt(sum / v->size);
-}
 
-void normalize_vector_formula_2(Vector* v, float vrz, float std){
-    for (int i = 0; i < v->size; ++i) {
-        v->elements[i] = (v->elements[i] - vrz) / std;
-    }
-}
 
 #endif

@@ -7,6 +7,8 @@
 #include "./tools/validations.c"
 #include "./operations/1_mean_column.c"
 #include "./operations/2_variance_column.c"
+#include "./operations/3_std_matrix_columns.c"
+#include "./operations/4_minmax_matrix_columns.c"
 #include "./operations/5_sum_matrix.c"
 #include "./operations/6_dot_matrix.c"
 #include "./operations/7_scalar_matrix.c"
@@ -42,12 +44,10 @@ int select_operation(int o, int f, int c, int r, int s, double e, int n, int fil
         calculate_column_matrix_variance(f, c, n, file);
         return 0;
     case 3:
-        // Matrix *M = create_matrix_from_file("op1.txt", f, c);
-        // Vector *V = matrix_col_std(M);
-        // print_matrix(M);
-        // print_vector(V);
+        calculate_matrix_columns_standard_deviation(f, c, n, file);
         return 0;
     case 4:
+        calculate_matrix_columns_min_max(f, c, n, file);
         return 0;
     case 5:
         calculate_sum_two_matrix(f, c, r, s, n, file);
