@@ -8,29 +8,28 @@
 #define MAX_LINE_LENGTH 40000
 
 
-void read_file(int *o,int *f, int *c, double *e, int *r, int *s, char* p, int *n){
-    char line[MAX_LINE_LENGTH];
-    char variable[MAX_LINE_LENGTH];
+void read_file(int *c, double *e, int *f, int *n, int *o, char *p, int *r, int *s ){
     float **matrix;
+    char variable[MAX_LINE_LENGTH];
+    char line[MAX_LINE_LENGTH];
 
-    //Se crea el archivo de salida del operador 1
+    /*Se crean los archivos de salida de los operadores*/
     FILE *output_file_op1 = fopen("op1.txt", "w");
     if (output_file_op1 == NULL) {
         printf("Error creating file op1.txt\n");
         exit(1);
     }
 
-    //Se crea el archivo de salida del operador 2
     FILE *output_file_op2 = fopen("op2.txt", "w");
     if (output_file_op2 == NULL) {
-        printf("Error creating file op2.txt\n");
+        printf("Error creando el archivo op2.txt\n");
         exit(1);
     }
 
     //Se abre el archivo de entrada
     FILE *data=fopen(p,"r");
     if (data == NULL) {
-        printf("Error opening input file %s\n", p);
+        printf("Error abriendo el archico de entrada %s\n", p);
         exit(1);
     }
     //Se lee el archivo linea por linea
